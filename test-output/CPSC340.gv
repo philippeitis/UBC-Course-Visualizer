@@ -1,0 +1,156 @@
+// CPSC340
+digraph {
+	node [color="#0D47CE" shape=box style=filled]
+	compound=true label=""
+	CPSC340 [color="#71ABFF" style=filled]
+	Initial [label="Choose 1 of:" color="#356FF6" shape=box]
+	Initial -> CPSC340
+	and1 [label="Choose 1 of:" color="#356FF6" shape=box]
+	and1 -> CPSC340
+	and2 [label="Choose 1 of:" color="#356FF6" shape=box]
+	and2 -> CPSC340
+	and3 [label="Choose either:" color="#356FF6" shape=box]
+	and3 -> CPSC340
+	// Hello world!
+	subgraph cluster0 {
+		"MATH 152" -> Initial
+		"MATH 221" -> Initial
+		"MATH 223" -> Initial
+		// Hello world!
+		subgraph cluster1 {
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+		}
+		"MATH 200" -> and1
+		"MATH 217" -> and1
+		"MATH 226" -> and1
+		"MATH 253" -> and1
+		"MATH 263" -> and1
+		// Hello world!
+		subgraph cluster1 {
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+		}
+		"STAT 200" -> and2
+		"STAT 203" -> and2
+		"STAT 241" -> and2
+		"STAT 251" -> and2
+		"COMM 291" -> and2
+		"ECON 325" -> and2
+		"ECON 327" -> and2
+		"PSYC 218" -> and2
+		"PSYC 278" -> and2
+		"PSYC 366" -> and2
+		"MATH 302" -> and2
+		"STAT 302" -> and2
+		"MATH 318" -> and2
+		"BIOL 300" -> and2
+		// Hello world!
+		subgraph cluster1 {
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+			// Hello world!
+			subgraph cluster2 {
+			}
+		}
+		"CPSC 221" -> and3
+		or0 [label=Or color="#356FF6" shape=box]
+		or0 -> and3 [lhead=cluster0 ltail=cluster1]
+		// Hello world!
+		subgraph cluster1 {
+			// Hello world!
+			subgraph cluster2 {
+			}
+			and4 [label="Choose all of:" color="#356FF6" shape=box]
+			and4 -> or0 [lhead=cluster1 ltail=cluster2]
+			and5 [label="Choose 1 of:" color="#356FF6" shape=box]
+			and5 -> or0 [lhead=cluster1 ltail=cluster2]
+			// Hello world!
+			subgraph cluster2 {
+				"CPSC 260" -> and4
+				"EECE 320" -> and4
+				// Hello world!
+				subgraph cluster3 {
+					// Hello world!
+					subgraph cluster4 {
+					}
+					// Hello world!
+					subgraph cluster4 {
+					}
+				}
+				"CPSC 210" -> and5
+				"EECE 210" -> and5
+				"EECE 309" -> and5
+				// Hello world!
+				subgraph cluster3 {
+					// Hello world!
+					subgraph cluster4 {
+					}
+					// Hello world!
+					subgraph cluster4 {
+					}
+					// Hello world!
+					subgraph cluster4 {
+					}
+				}
+			}
+		}
+	}
+}
