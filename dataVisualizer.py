@@ -74,6 +74,25 @@ class node():
     def get_branch_num(self):
         return(len(self.branches))
 
+    def gen_title(self):
+        for branch in self.branches:
+            if 'either' in branch.title:
+                return("Choose either:")
+
+        parentNodex = self.parentNode
+        for branch in parentNodex.branches:
+            if 'either' in branch.title:
+                return("Or")
+        return("Choose " + str(self.nchoose) + " of:")
+
+    def trim(self):
+        if len(self.branches) == 1:
+            parentNodex = self.parentNode
+            self = self.branches[0]
+            self.parentNode = parentNodex
+
+
+        return self
 def navigateTree(parentNode):
     
     # Goes through all the branches of the parent node recursively
@@ -89,39 +108,40 @@ def navigateTree(parentNode):
                 if branch.type != 'CHILD':
                     print(branchParent.title + "->" + branch.title)
                     print("Choose " + str(branch.nchoose) + " of:")
-
                 else:
                     print(branch.title)
                 navigateTree(branch)
-
-# Bad code
-def navigateTreex(parentNode):
-    for branch in parentNode.branches:
-        print(branch.title)
-        for branchx in branch.branches:
-            print(branchx.title)
 
 def initializeDrawTree(parentNode):
     from graphviz import Digraph
     dot = Digraph(comment='CPSC340')
     dot.attr(compound='true')
-    dot.attr(bgcolor='grey', label='CPSC340', fontcolor='white')
-
+    dot.attr(label='', fontcolor='white')
+    dot.node_attr.update(color='lightblue2', style='filled',shape='box')
     graph = drawTree(dot,parentNode)
     graph.render('test-output/CPSC340.gv', view=True)  # doctest: +SKIP
     return dot
 
-def drawTree(graph,parentNode):
-    with graph.subgraph(name = parentNode.title) as graphx:
+def drawTree(graph,parentNode,num=0):
+    titlex = 'cluster' + str(num)
+    num+=1
+    if num%2 == 0:
+        bgcolorx = '333F48'
+    else:
+        bgcolorx = 'BF5700'
+    with graph.subgraph(name = titlex,comment='Hello world!') as graphx:
         for branch in parentNode.branches:
+            branch = branch.trim()
             branchParent = branch.get_parent_node()
             if branchParent:
                 if branch.type != 'CHILD':
+                    graph.node(branch.title,branch.gen_title())
                     graph.edge(branch.title,branchParent.title)
                 else:
                     graph.edge(branch.title,branchParent.title)
-            drawTree(graphx,branch)
+            drawTree(graphx,branch,num)
     return graph
+
 # Decent code, needs improvement   
 def coursePreReqTreeGen():
     preReqs = 'One of MATH 152, MATH 221, MATH 223 and one of MATH 200, MATH 217, MATH 226, MATH 253, MATH 263 and one of STAT 200, STAT 203, STAT 241, STAT 251, COMM 291, ECON 325, ECON 327, PSYC 218, PSYC 278, PSYC 366, MATH 302, STAT 302, MATH 318, BIOL 300; and either (a) CPSC 221 or (b) all of CPSC 260, EECE 320 and one of CPSC 210, EECE 210, EECE 309.'
