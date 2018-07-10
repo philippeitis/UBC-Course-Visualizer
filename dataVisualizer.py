@@ -93,6 +93,7 @@ class node():
 
 
         return self
+
 def navigateTree(parentNode):
     
     # Goes through all the branches of the parent node recursively
@@ -115,30 +116,35 @@ def navigateTree(parentNode):
 def initializeDrawTree(parentNode):
     from graphviz import Digraph
     dot = Digraph(comment='CPSC340')
-    dot.attr(compound='true')
-    dot.attr(label='', fontcolor='white')
-    dot.node_attr.update(color='lightblue2', style='filled',shape='box')
+    dot.attr(compound='true',label='', fontcolor='white')
+    dot.attr()
+    dot.node_attr.update(color='#0D47CE', style='filled',shape='box',fontcolor='black')
+    dot.node('CPSC340',color='#71ABFF',style='filled',fontcolor='black')
     graph = drawTree(dot,parentNode)
+    
     graph.render('test-output/CPSC340.gv', view=True)  # doctest: +SKIP
     return dot
 
 def drawTree(graph,parentNode,num=0):
     titlex = 'cluster' + str(num)
     num+=1
-    if num%2 == 0:
-        bgcolorx = '333F48'
-    else:
-        bgcolorx = 'BF5700'
+    titley = 'cluster' + str(num-2)
+    if num == 0:
+        graph.attrs('node', color = 'white', style = 'filled')
     with graph.subgraph(name = titlex,comment='Hello world!') as graphx:
         for branch in parentNode.branches:
             branch = branch.trim()
-            branchParent = branch.get_parent_node()
-            if branchParent:
-                if branch.type != 'CHILD':
-                    graph.node(branch.title,branch.gen_title())
-                    graph.edge(branch.title,branchParent.title)
+            if branch.type != 'CHILD':
+                graph.node(branch.title,branch.gen_title(), shape = 'box',color='#356FF6')
+                if num-2 >= 0:
+                    print(titley)
+                    graph.edge(branch.title,branch.parentNode.title, lhead=titley,ltail=titlex)
                 else:
-                    graph.edge(branch.title,branchParent.title)
+                    graph.edge(branch.title,branch.parentNode.title)
+            else:
+                graph.edge(branch.title,branch.parentNode.title)
+
+                
             drawTree(graphx,branch,num)
     return graph
 
