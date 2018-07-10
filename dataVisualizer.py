@@ -61,10 +61,19 @@ class node():
     def get_branch_num(self):
         return(len(self.branches))
 
-def main(args):
-    return 0
+def switchToChildNode(activeNode,title):
     
+    # Creates a child node and switches the active node to the child node
+
+    activeNode.set_branch(node(title))          # Creates new node
+    currNode = activeNode.get_last_branch()     # Goes to new node
+    currNode.set_parent_node(activeNode)        # Sets parent node of new node
+    return currNode
+  
 def navigateTree(parentNode):
+    
+    # Goes through all the branches of the parent node recursively
+
     if parentNode.get_branch_num() == 0:
         return(False)
 
@@ -72,11 +81,15 @@ def navigateTree(parentNode):
         for branch in parentNode.branches:
             branchParent = branch.get_parent_node()
             if branchParent:
-                print("Parent of " + branch.title + " is " + branchParent.title)
-            else:
-                print(branch.title)
-            navigateTree(branch)
+                if branch.type != 'CHILD':
+                    print(branchParent.title + "->" + branch.title)
+                    print("Choose " + str(branch.nchoose) + " of:")
 
+                else:
+                    print(branch.title)
+                navigateTree(branch)
+
+# Bad code
 def navigateTreex(parentNode):
     for branch in parentNode.branches:
         print(branch.title)
@@ -98,20 +111,17 @@ def initializeDrawTree(parentNode):
 
     dot.render('test-output/CPSC340x.gv', view=True)  # doctest: +SKIP
     return dot
-   
-def CPSC340():
-    import time
+
+# Decent code, needs improvement   
+def coursePreReqTreeGen():
     preReqs = 'One of MATH 152, MATH 221, MATH 223 and one of MATH 200, MATH 217, MATH 226, MATH 253, MATH 263 and one of STAT 200, STAT 203, STAT 241, STAT 251, COMM 291, ECON 325, ECON 327, PSYC 218, PSYC 278, PSYC 366, MATH 302, STAT 302, MATH 318, BIOL 300; and either (a) CPSC 221 or (b) all of CPSC 260, EECE 320 and one of CPSC 210, EECE 210, EECE 309.'
 
-    preReqKWList = ["one of", "either", "or", "all of", "and"]
+    preReqKWList = ["one of","two of", "three of", "either", "or", "all of", "and"]
     newBranchKW = "and"
     subBranchKW = "either"
     escapeBranchKW = "or"
 
-    parentNode = node('CPSC340')
-    parentNode.set_type('ROOT')
-
-    nchooseDict = {"one of":1,"two of":2,"three of":3,"four of":4,"all of":'all'}
+    nchooseDict = {"one of":1,"two of":2,"three of":3,"all of":'all'}
 
     preReqList = []
     preReqsx = preReqs.split(" ")
@@ -144,13 +154,21 @@ def CPSC340():
                 courseCode = courseCode.strip(character)
             preReqList.append(courseCode)
 
+    # Initializing tree with parent node and name
+    parentNode = node('CPSC340')
+    parentNode.set_type('ROOT')
+
+    # Creating branch (node) for first pre-reqs, setting active node (node being operated on)
+    # Setting information
     parentNode.set_branch(node("Initial"))
     activeNode = parentNode.get_last_branch()
     activeNode.set_parent_node(parentNode)
     activeNode.set_nchoose(nchooseDict[preReqList[0].lower()])
 
+    
     i = 0
    
+    # This code exists solely for the initial node
     for string in preReqList[1:]:
         i+=1
         if string.lower() in newBranchKW:
@@ -159,76 +177,57 @@ def CPSC340():
             break
         elif string.lower() in escapeBranchKW:
             break
-        activeNode.set_branch(node(string))
-        currNode = activeNode.get_last_branch()
-        currNode.set_nchoose(0)
-    
-    print(i)
+        currNode = switchToChildNode(activeNode,string)
+        currNode.set_type('CHILD')
     a = 0
     b = 0
-    activeNode.get_parent_node()
 
+    # Traverses the list and creates nodes with branches for each pre-requisite
     for string in preReqList[i:]:
         if string.lower() in newBranchKW:
             a += 1
-            print("Setting new branch, switching from: " + activeNode.title)
+
+            # This creates a new branch from the parent of the branch and switches to the new branch if 'and' is detected: creates a new branch in parallel to the current one and switches to it
 
             activeNode = activeNode.get_parent_node()   # Goes to active node's parent node (either is after and)
-            activeNode.set_branch(node(string+str(a)))         # Makes new node
-            currNode = activeNode.get_last_branch()     # Goes to new node
-            currNode.set_parent_node(activeNode)        # Sets active node as parent
-            activeNode = currNode                       # Switches operation to new node
+            activeNode = switchToChildNode(activeNode,(string+str(a)))
 
-            print("New branch set, switching to new node: " + activeNode.title)
-            print("")
 
         elif string.lower() in subBranchKW:
-            print("Going to parent node from: " + activeNode.title)
 
-            activeNode.set_branch(node(string))         # Creates new node
-            currNode = activeNode.get_last_branch()     # Goes to new node
-            currNode.set_parent_node(activeNode)        # Sets parent node of new node
-            currNode.set_nchoose(1)                     # Sets nchoose
-            activeNode = currNode                       # Switches active node
-            
-            print("Active node is now: " + activeNode.title)
-            print("")
+            # This creates a new branch from the active branch and switches to the new branch if 'either' is detected: creates a new branch below the current one and switches to it
+
+            activeNode = switchToChildNode(activeNode,(string))
+            activeNode.set_nchoose(1)
 
         elif string.lower() in escapeBranchKW:
-            print("Going to parent branch from: " + activeNode.title)
+
+            # This creates a new branch from the parent of the active branch, switches to it, and creates a new branch from the new branch if 'or' is detected
+
             activeNode = activeNode.get_parent_node()   # Goes to parent node
-            print("Parent node is: " + activeNode.title)
-            activeNode.set_branch(node(string+str(b)))
-            currNode = activeNode.get_last_branch()
-            currNode.set_parent_node(activeNode)
-            activeNode = currNode
+
+            activeNode = switchToChildNode(activeNode,(string+str(b)))
+            activeNode.set_nchoose(1)
+    
             b+=1
-            activeNode.set_branch(node(string+str(b)))
-            currNode = activeNode.get_last_branch()
-            currNode.set_parent_node(activeNode)
-            activeNode = currNode
-            print("Active node is now: " + activeNode.title)
-            print("")
+            a+=1
+
+            activeNode = switchToChildNode(activeNode,('and'+str(a)))
+            activeNode.set_nchoose(1)
+
 
         elif string.lower() in nchooseDict.keys():
-            print('choose ' + str(nchooseDict[string.lower()]))
             activeNode.set_nchoose(nchooseDict[string.lower()])
 
         else:
-            activeNode.set_branch(node(string))
-            currNode = activeNode.get_last_branch()
+            currNode = switchToChildNode(activeNode,string)
             currNode.set_type('CHILD')
-            print("Active node: " + activeNode.title)
-            print("Course code being added: " + string)
 
 
+    navigateTree(parentNode)
 
-    print("No more string processing.")
-
-    navigateTreex(parentNode)
-    initializeDrawTree(parentNode)
-
-CPSC340()
+def main(args):
+    return 0
 
 def demoPlotter():
     
@@ -260,7 +259,7 @@ def demoPlotter():
     dot.edges(['BA', 'CA', 'DA'])
     dot.render('test-output/CPSC340.gv', view=True)  # doctest: +SKIP
 
-plotter()
 if __name__ == '__main__':
     import sys
+    coursePreReqTreeGen()
     sys.exit(main(sys.argv))
