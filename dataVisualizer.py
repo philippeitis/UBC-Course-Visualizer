@@ -52,6 +52,19 @@ class node():
     def set_parent_node(self,parentNode):
         self.parentNode = parentNode
 
+    def get_branches():
+        return self.branches
+
+    def switch_to_child_node(self,title):
+        # Creates a child node and switches the active node to the child node
+        # No idea if this should be in a seperate function but whatever
+
+        self.set_branch(node(title))          # Creates new node
+        currNode = self.get_last_branch()     # Goes to new node
+        currNode.set_parent_node(self)        # Sets parent node of new node
+        return currNode
+        
+
     def get_parent_node(self):
         if self.parentNode:
             return(self.parentNode)
@@ -61,18 +74,10 @@ class node():
     def get_branch_num(self):
         return(len(self.branches))
 
-def switchToChildNode(activeNode,title):
-    
-    # Creates a child node and switches the active node to the child node
-
-    activeNode.set_branch(node(title))          # Creates new node
-    currNode = activeNode.get_last_branch()     # Goes to new node
-    currNode.set_parent_node(activeNode)        # Sets parent node of new node
-    return currNode
-  
 def navigateTree(parentNode):
     
     # Goes through all the branches of the parent node recursively
+    # Probably recursively
 
     if parentNode.get_branch_num() == 0:
         return(False)
@@ -101,17 +106,22 @@ def initializeDrawTree(parentNode):
     dot = Digraph(comment='CPSC340')
     dot.attr(compound='true')
     dot.attr(bgcolor='grey', label='CPSC340', fontcolor='white')
-    clusternum = 0
-    for branch in parentNode.branches:
-        string = 'cluster' + str(clusternum)
 
-            
-        dot.edge(branch.title,'CPSC340')
-        clusternum += 1
-
-    dot.render('test-output/CPSC340x.gv', view=True)  # doctest: +SKIP
+    graph = drawTree(dot,parentNode)
+    graph.render('test-output/CPSC340.gv', view=True)  # doctest: +SKIP
     return dot
 
+def drawTree(graph,parentNode):
+    with graph.subgraph(name = parentNode.title) as graphx:
+        for branch in parentNode.branches:
+            branchParent = branch.get_parent_node()
+            if branchParent:
+                if branch.type != 'CHILD':
+                    graph.edge(branch.title,branchParent.title)
+                else:
+                    graph.edge(branch.title,branchParent.title)
+            drawTree(graphx,branch)
+    return graph
 # Decent code, needs improvement   
 def coursePreReqTreeGen():
     preReqs = 'One of MATH 152, MATH 221, MATH 223 and one of MATH 200, MATH 217, MATH 226, MATH 253, MATH 263 and one of STAT 200, STAT 203, STAT 241, STAT 251, COMM 291, ECON 325, ECON 327, PSYC 218, PSYC 278, PSYC 366, MATH 302, STAT 302, MATH 318, BIOL 300; and either (a) CPSC 221 or (b) all of CPSC 260, EECE 320 and one of CPSC 210, EECE 210, EECE 309.'
@@ -177,7 +187,7 @@ def coursePreReqTreeGen():
             break
         elif string.lower() in escapeBranchKW:
             break
-        currNode = switchToChildNode(activeNode,string)
+        currNode = activeNode.switch_to_child_node(string)
         currNode.set_type('CHILD')
     a = 0
     b = 0
@@ -190,14 +200,14 @@ def coursePreReqTreeGen():
             # This creates a new branch from the parent of the branch and switches to the new branch if 'and' is detected: creates a new branch in parallel to the current one and switches to it
 
             activeNode = activeNode.get_parent_node()   # Goes to active node's parent node (either is after and)
-            activeNode = switchToChildNode(activeNode,(string+str(a)))
+            activeNode = activeNode.switch_to_child_node(string+str(a))
 
 
         elif string.lower() in subBranchKW:
 
             # This creates a new branch from the active branch and switches to the new branch if 'either' is detected: creates a new branch below the current one and switches to it
 
-            activeNode = switchToChildNode(activeNode,(string))
+            activeNode = activeNode.switch_to_child_node(string)
             activeNode.set_nchoose(1)
 
         elif string.lower() in escapeBranchKW:
@@ -206,13 +216,13 @@ def coursePreReqTreeGen():
 
             activeNode = activeNode.get_parent_node()   # Goes to parent node
 
-            activeNode = switchToChildNode(activeNode,(string+str(b)))
+            activeNode = activeNode.switch_to_child_node(string+str(b))
             activeNode.set_nchoose(1)
     
             b+=1
             a+=1
 
-            activeNode = switchToChildNode(activeNode,('and'+str(a)))
+            activeNode = activeNode.switch_to_child_node('and'+str(a))
             activeNode.set_nchoose(1)
 
 
@@ -220,12 +230,12 @@ def coursePreReqTreeGen():
             activeNode.set_nchoose(nchooseDict[string.lower()])
 
         else:
-            currNode = switchToChildNode(activeNode,string)
+            currNode = activeNode.switch_to_child_node(string)
             currNode.set_type('CHILD')
 
 
     navigateTree(parentNode)
-
+    initializeDrawTree(parentNode)
 def main(args):
     return 0
 
