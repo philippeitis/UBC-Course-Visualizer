@@ -38,7 +38,7 @@ class node:
         return self.types
         
     def get_type(self):
-		return self.type
+        return self.type
 		
     def set_branches(self, branches):
         self.branches.extend(branches)
@@ -239,8 +239,8 @@ def coursePreReqTreeGen(courseCode,preReqs=False):
             activeNode = activeNode.switch_to_child_node(string+str(b))
             activeNode.set_nchoose(1)
     
-            b+=1
-            a+=1
+            b += 1
+            a += 1
 
             activeNode = activeNode.switch_to_child_node('and'+str(a))
             activeNode.set_nchoose(1)
