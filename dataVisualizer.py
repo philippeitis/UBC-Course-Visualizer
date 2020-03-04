@@ -22,7 +22,7 @@
 #  
 #
   
-class node():
+class node:
     def __init__ (self,title):
         self.title = title
         self.types = ["ROOT","PARENT","CHILD"]
@@ -35,31 +35,30 @@ class node():
         self.type = typeOfNode
     
     def get_types():
-        return(self.types)
+        return self.types
         
     def get_type(self):
-		return(self.type)
+		return self.type
 		
-    def set_branches(self,branches):
-        for branch in branches:
-            self.branches.append(branch)
+    def set_branches(self, branches):
+        self.branches.extend(branches)
 
-    def set_branch(self,branch):
+    def set_branch(self, branch):
         self.branches.append(branch)
 
     def get_last_branch(self):
-        return(self.branches[-1])
+        return self.branches[-1]
 
-    def set_nchoose(self,nchoose):
+    def set_nchoose(self, nchoose):
         self.nchoose = nchoose
 
-    def set_parent_node(self,parentNode):
+    def set_parent_node(self, parentNode):
         self.parentNode = parentNode
 
     def get_branches(self):
         return self.branches
 
-    def switch_to_child_node(self,title):
+    def switch_to_child_node(self, title):
         # Creates a child node and switches the active node to the child node
         # No idea if this should be in a seperate function but whatever
 
@@ -71,12 +70,12 @@ class node():
 
     def get_parent_node(self):
         if self.parentNode:
-            return(self.parentNode)
+            return self.parentNode
         else:
-            return(False)
+            return False
 
     def get_branch_num(self):
-        return(len(self.branches))
+        return len(self.branches)
 
     def gen_title(self):
         for branch in self.branches:
@@ -87,19 +86,16 @@ class node():
         for branch in parentNodex.branches:
             if 'either' in branch.title:
                 return("Or")
-        return("Choose " + str(self.nchoose) + " of:")
+        return "Choose " + str(self.nchoose) + " of:"
 
     def trim(self):
         if len(self.branches) == 1:
             parentNodex = self.parentNode
             self = self.branches[0]
             self.parentNode = parentNodex
-
-
         return self
 
 def navigateTree(parentNode):
-    
     # Goes through all the branches of the parent node recursively
     # Probably recursively
     
@@ -126,24 +122,23 @@ def initializeDrawTree(parentNode):
 
 def drawTree(graph,parentNode,num=0):
     titlex = 'cluster' + str(num)
-    num+=1
+    num += 1
     titley = 'cluster' + str(num-2)
     if num == 0:
         graph.attrs('node', color = 'white', style = 'filled')
-    with graph.subgraph(name = titlex,comment='Hello world!') as graphx:
+    with graph.subgraph(name=titlex, comment='Hello world!') as graphx:
         for branch in parentNode.branches:
             branch = branch.trim()
             if branch.type != 'CHILD':
-                graph.node(branch.title,branch.gen_title(), shape = 'box',color='#356FF6')
-                if num-2 >= 0:
+                graph.node(branch.title ,branch.gen_title(), shape='box',color='#356FF6')
+                if num >= 2:
                     print(titley)
-                    graph.edge(branch.title,branch.parentNode.title, lhead=titley,ltail=titlex)
+                    graph.edge(branch.title, branch.parentNode.title, lhead=titley,ltail=titlex)
                 else:
-                    graph.edge(branch.title,branch.parentNode.title)
+                    graph.edge(branch.title, branch.parentNode.title)
             else:
-                graph.edge(branch.title,branch.parentNode.title)
+                graph.edge(branch.title, branch.parentNode.title)
 
-                
             drawTree(graphx,branch,num)
     return graph
 
@@ -151,7 +146,7 @@ def drawTree(graph,parentNode,num=0):
 def coursePreReqTreeGen(courseCode,preReqs=False):
     print(preReqs)
 	
-    preReqKWList = ("one of","two of", "three of", "either", "or", "all of", "and")
+    preReqKWList = ("one of", "two of", "three of", "either", "or", "all of", "and")
     
     # To make expanding these easier, I have left them as lists in case new key words appear
     newBranchKW = ("and")
@@ -207,7 +202,6 @@ def coursePreReqTreeGen(courseCode,preReqs=False):
     for string in preReqList[1:]:
         i+=1
         string = string.lower()
-
         if string in newBranchKW:
             break
         elif string in subBranchKW:
@@ -221,7 +215,6 @@ def coursePreReqTreeGen(courseCode,preReqs=False):
 
     # Traverses the list and creates nodes with branches for each pre-requisite
     for string in preReqList[i:]:
-		
         string = string.lower()
         if string in newBranchKW:
             a += 1
@@ -230,8 +223,6 @@ def coursePreReqTreeGen(courseCode,preReqs=False):
 
             activeNode = activeNode.get_parent_node()   # Goes to active node's parent node (either is after and)
             activeNode = activeNode.switch_to_child_node(string+str(a))
-
-
         elif string in subBranchKW:
 
             # This creates a new branch from the active branch and switches to the new branch if 'either' is detected: creates a new branch below the current one and switches to it
